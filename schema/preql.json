@@ -1,0 +1,725 @@
+{
+    "$id": "https://wildboar.software/preql.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "DBMSFriendlyIdentifier": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+        },
+        "APIObjectName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+        },
+        "IndexType": {
+            "type": "string",
+            "enum": [
+                "PLAIN",
+                "SPATIAL",
+                "TEXTUAL",
+                "UNIQUE"
+            ]
+        },
+        "ForeignKeyAction": {
+            "type": "string",
+            "enum": [
+                "CASCADE",
+                "NULLIFY",
+                "RESTRICT",
+                "DEFAULT"
+            ]
+        },
+        "APIObject": {
+            "type": "object",
+            "properties": {
+                "apiVersion": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "type": "object"
+                }
+            }
+        },
+        "APIObjectAPIVersion_v1_0_0": {
+            "$comment": "See https://github.com/bcherny/json-schema-to-typescript/pull/264#issuecomment-713830950",
+            "type": "string",
+            "enum": [
+                "preql/v1.0.0"
+            ]
+        },
+        "APIObjectAPIVersion": {
+            "oneOf": [
+                { "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0" }
+            ]
+        },
+        "APIObjectMetadata": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "namespace": {
+                    "type": "string",
+                    "default": "default"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "PreqlAttributeSpec_v1_0_0": {
+            "title": "PreqlAttributeSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier",
+                "nullable"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "structName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "nullable": {
+                    "type": "boolean"
+                },
+                "dataTypeName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "multiValued": {
+                    "type": "boolean"
+                },
+                "sparse": {
+                    "type": "boolean"
+                },
+                "characterSet": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "collation": {
+                    "$ref": "#/definitions/APIObjectName"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlCharacterSetSpec_v1_0_0": {
+            "title": "PreqlCharacterSetSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "targetEquivalents"
+            ],
+            "properties": {
+                "targetEquivalents": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "defaultCollation": {
+                    "type": "string"
+                },
+                "maximumCharacterLength": {
+                    "type": "number",
+                    "minimum": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlCollationSpec_v1_0_0": {
+            "title": "PreqlCollationSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "targetEquivalents"
+            ],
+            "properties": {
+                "targetEquivalents": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "caseSensitive": {
+                    "type": "boolean"
+                },
+                "accentSensitive": {
+                    "type": "boolean"
+                },
+                "kanaSensitive": {
+                    "type": "boolean"
+                },
+                "widthSensitive": {
+                    "type": "boolean"
+                },
+                "varationSelectorSensitive": {
+                    "type": "boolean"
+                },
+                "binary": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlDataTypeSpec_v1_0_0": {
+            "title": "PreqlDataTypeSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [],
+            "properties": {
+                "targetEquivalents": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlDatabaseSpec_v1_0_0": {
+            "title": "PreqlDatabaseSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "characterSet": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "collation": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "maximumSizeInBytes": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlEntitySpec_v1_0_0": {
+            "title": "PreqlEntitySpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier",
+                "databaseName",
+                "rootStruct"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "rootStruct": {
+                    "$ref": "#/definitions/APIObjectName"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlEntrySpec_v1_0_0": {
+            "title": "PreqlEntrySpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "databaseName",
+                "structName",
+                "id",
+                "values"
+            ],
+            "properties": {
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "structName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "id": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "values": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlIndexSpec_v1_0_0": {
+            "title": "PreqlIndexSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier",
+                "type",
+                "structName",
+                "databaseName",
+                "clustered",
+                "sparse",
+                "keyAttributes"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "type": {
+                    "$ref": "#/definitions/IndexType"
+                },
+                "structName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "clustered": {
+                    "type": "boolean"
+                },
+                "sparse": {
+                    "type": "boolean"
+                },
+                "keyAttributes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "minItems": 1
+                },
+                "includedAttributes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "minItems": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlForeignKeySpec_v1_0_0": {
+            "title": "PreqlForeignKeySpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier",
+                "childStructName",
+                "parentStructName",
+                "databaseName",
+                "nullable",
+                "onDeleteAction",
+                "onUpdateAction"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "childStructName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "parentStructName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "nullable": {
+                    "type": "boolean"
+                },
+                "onDeleteAction": {
+                    "$ref": "#/definitions/ForeignKeyAction"
+                },
+                "onUpdateAction": {
+                    "$ref": "#/definitions/ForeignKeyAction"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlStructSpec_v1_0_0": {
+            "title": "PreqlStructSpec_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "identifier",
+                "databaseName"
+            ],
+            "properties": {
+                "identifier": {
+                    "$ref": "#/definitions/DBMSFriendlyIdentifier"
+                },
+                "databaseName": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "characterSet": {
+                    "$ref": "#/definitions/APIObjectName"
+                },
+                "collation": {
+                    "$ref": "#/definitions/APIObjectName"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlAttribute_v1_0_0": {
+            "title": "PreqlAttribute_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlAttribute"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlAttributeSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlCharacterSet_v1_0_0": {
+            "title": "PreqlCharacterSet_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlCharacterSet"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlCharacterSetSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlCollation_v1_0_0": {
+            "title": "PreqlCollation_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlCollation"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlCollationSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlDatabase_v1_0_0": {
+            "title": "PreqlDatabase_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlDatabase"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlDatabaseSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlDataType_v1_0_0": {
+            "title": "PreqlDataType_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlDataType"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlDataTypeSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlEntity_v1_0_0": {
+            "title": "PreqlEntity_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlEntity"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlEntitySpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlEntry_v1_0_0": {
+            "title": "PreqlEntry_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlEntry"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlEntrySpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlForeignKey_v1_0_0": {
+            "title": "PreqlForeignKey_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlForeignKey"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlForeignKeySpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlIndex_v1_0_0": {
+            "title": "PreqlIndex_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlIndex"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlIndexSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlStruct_v1_0_0": {
+            "title": "PreqlStruct_v1_0_0",
+            "description": "",
+            "type": "object",
+            "required": [
+                "apiVersion",
+                "kind",
+                "metadata",
+                "spec"
+            ],
+            "properties": {
+                "apiVersion": {
+                    "$ref": "#/definitions/APIObjectAPIVersion_v1_0_0"
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "PreqlStruct"
+                    ]
+                },
+                "metadata": {
+                    "$ref": "#/definitions/APIObjectMetadata"
+                },
+                "spec": {
+                    "$ref": "#/definitions/PreqlStructSpec_v1_0_0"
+                }
+            },
+            "additionalProperties": false
+        },
+        "PreqlAttribute": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlAttribute_v1_0_0" }
+            ]
+        },
+        "PreqlCharacterSet": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlCharacterSet_v1_0_0" }
+            ]
+        },
+        "PreqlCollation": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlCollation_v1_0_0" }
+            ]
+        },
+        "PreqlDatabase": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlDatabase_v1_0_0" }
+            ]
+        },
+        "PreqlDataType": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlDataType_v1_0_0" }
+            ]
+        },
+        "PreqlEntity": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlEntity_v1_0_0" }
+            ]
+        },
+        "PreqlEntry": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlEntry_v1_0_0" }
+            ]
+        },
+        "PreqlForeignKey": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlForeignKey_v1_0_0" }
+            ]
+        },
+        "PreqlIndex": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlIndex_v1_0_0" }
+            ]
+        },
+        "PreqlStruct": {
+            "oneOf": [
+                { "$ref": "#/definitions/PreqlStruct_v1_0_0" }
+            ]
+        }
+    }
+}
